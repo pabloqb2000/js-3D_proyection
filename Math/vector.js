@@ -299,6 +299,35 @@ class Vector {
     }
 
     /**
+     * Rotates this vector (should be 3D)
+     * on the given axis by the given a radians
+     */
+    rotate3D(a, axis=0) {
+        let M = Matrix.identity(3);
+        switch(axis) {
+            case 0:
+                M.set(1,1,cos(a))
+                 .set(1,2,-sin(a))
+                 .set(2,1,sin(a))
+                 .set(2,2,cos(a));
+            break;
+            case 1:
+                M.set(0,0,cos(a))
+                 .set(2,0,-sin(a))
+                 .set(0,2,sin(a))
+                 .set(2,2,cos(a));
+            break;
+            case 2:
+                M.set(0,0,cos(a))
+                 .set(0,1,-sin(a))
+                 .set(1,0,sin(a))
+                 .set(1,1,cos(a));
+            break;
+        }
+        return new Vector(Matrix.mult(M, this.toMatrix()).col(0));
+    }
+
+    /**
      * Applies the given function to every element in the vector
      * 
      * Function should be of type f(v, i)

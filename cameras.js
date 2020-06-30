@@ -12,6 +12,9 @@ class AbstractCamera {
         this.pos = position;
         this.rot = rotation;
         this.axis = this.getAxis();
+
+        this.moveSpeed = 0.1;
+        this.rotSpeed = 0.02;
     }
 
     /**
@@ -54,6 +57,8 @@ class AbstractCamera {
         let proys = obj.points.map(p => {
             // Transform the point to have coordinates relative to this camera 
             let v = p.copy().add(obj.pos).sub(this.pos);
+            // Rotate the object acording to the rotation of this camera
+            v = v.rotate3D(-this.rot.getX(), 0).rotate3D(-this.rot.getY(), 1).rotate3D(-this.rot.getZ(), 2);
             // Proyect the point
             return this.proyect(v);
         })
@@ -106,12 +111,18 @@ class AbstractCamera {
      */
     update() {
         // Move
-        if(keyIsDown(87)) cam.pos.add(new Vector([0,0,0.1])); // W
-        if(keyIsDown(83)) cam.pos.sub(new Vector([0,0,0.1]));// S
-        if(keyIsDown(65)) cam.pos.sub(new Vector([0.1,0,0])); // A
-        if(keyIsDown(68)) cam.pos.add(new Vector([0.1,0,0])); // D
-        if(keyIsDown(38)) cam.pos.add(new Vector([0,0.1,0])); // UP ARROW
-        if(keyIsDown(40)) cam.pos.sub(new Vector([0,0.1,0])); // DOWN ARROW
+        if(keyIsDown(87)) cam.pos.add(new Vector([0,0,this.moveSpeed])); // W
+        if(keyIsDown(83)) cam.pos.sub(new Vector([0,0,this.moveSpeed])); // S
+        if(keyIsDown(65)) cam.pos.sub(new Vector([this.moveSpeed,0,0])); // A
+        if(keyIsDown(68)) cam.pos.add(new Vector([this.moveSpeed,0,0])); // D
+        if(keyIsDown(32)) cam.pos.add(new Vector([0,this.moveSpeed,0])); // SPACE
+        if(keyIsDown(16)) cam.pos.sub(new Vector([0,this.moveSpeed/2,0])); // SHIFT
+
+        // Rotate
+        if(mouseLocked) {
+            this.rot.data[1] += (movedX * this.rotSpeed) % (2*PI);
+            this.rot.data[0] = min(max(-PI/2, this.rot.data[0] + movedY*this.rotSpeed), PI/2);
+        }
     }
 
     /**
