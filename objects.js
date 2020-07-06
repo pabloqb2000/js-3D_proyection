@@ -25,6 +25,7 @@ class PointCloud {
      */
     move(v) {
         this.pos.add(v);
+        return this;
     }
 
     /**
@@ -36,6 +37,7 @@ class PointCloud {
         for(let p of this.points) {
             p.mult(s);  
         }
+        return this;
     }
 }
 

@@ -58,10 +58,15 @@ class AbstractCamera {
             // Transform the point to have coordinates relative to this camera 
             let v = p.copy().add(obj.pos).sub(this.pos);
             // Rotate the object acording to the rotation of this camera
-            v = v.rotate3D(-this.rot.getX(), 0).rotate3D(-this.rot.getY(), 1).rotate3D(-this.rot.getZ(), 2);
+            v = this.rotateToView(v);
+            // Crop the points behind the camera
+            if(cropBtn.active) {
+                v = this.crop(v);
+            }
             // Proyect the point
             return this.proyect(v);
         })
+        // Scale the values
         proys.forEach(p => p.mult(scaleSld.value));
         
         // Draw points
@@ -110,8 +115,19 @@ class AbstractCamera {
      * Update position and rotation based on user input
      */
     update() {
+        // Create 3 axis in the direction the camera is pointing towards
+        let u = (new Vector([1,0,0])).mult(this.moveSpeed);
+        let v = (new Vector([0,1,0])).mult(this.moveSpeed);
+        let w = (new Vector([0,0,1])).mult(this.moveSpeed);
+        u.rotate3D(this.rot.getX(), 0).rotate3D(this.rot.getY(), 1).rotate3D(this.rot.getZ(), 2);
+        v.rotate3D(this.rot.getX(), 0).rotate3D(this.rot.getY(), 1).rotate3D(this.rot.getZ(), 2);
+        w.rotate3D(this.rot.getX(), 0).rotate3D(this.rot.getY(), 1).rotate3D(this.rot.getZ(), 2);
+
+        // Remove their y component to make the player stay at the same height
+
         // Move
-        if(keyIsDown(87)) cam.pos.add(new Vector([0,0,this.moveSpeed])); // W
+        if(keyIsDown(87)) cam.pos.add(v); // W
+        //if(keyIsDown(87)) cam.pos.add(new Vector([0,0,this.moveSpeed])); // W
         if(keyIsDown(83)) cam.pos.sub(new Vector([0,0,this.moveSpeed])); // S
         if(keyIsDown(65)) cam.pos.sub(new Vector([this.moveSpeed,0,0])); // A
         if(keyIsDown(68)) cam.pos.add(new Vector([this.moveSpeed,0,0])); // D
@@ -119,16 +135,41 @@ class AbstractCamera {
         if(keyIsDown(16)) cam.pos.sub(new Vector([0,this.moveSpeed/2,0])); // SHIFT
 
         // Rotate
-        if(mouseLocked) {
+        if(rotBtn.active) {
             this.rot.data[1] += (movedX * this.rotSpeed) % (2*PI);
             this.rot.data[0] = min(max(-PI/2, this.rot.data[0] + movedY*this.rotSpeed), PI/2);
         }
     }
 
     /**
+     * Rotate the objects that are going to be proyected 
+     * acording to the rotation of this camera 
+     * 
+     * @param v Vector to rotate
+     */
+    rotateToView(v){
+        return v.rotate3D(-this.rot.getZ(), 2).rotate3D(-this.rot.getY(), 1).rotate3D(-this.rot.getX(), 0);
+    }
+
+    /**
+     * If the given vector is behind the camera
+     * (if it has a negative z value)
+     * sets its coordinates to NaN so that the point
+     * is not drawn
+     * 
+     * @param v 
+     */
+    crop(v) {
+        if(v.getZ() < 0) {
+            v.map(() => NaN);
+        }
+        return v;
+    }
+
+    /**
      * Temp
      */
     proyect(p) {
-        return new Vector([p.getX(), p.getY()]);
+        return new Vector([p.getX()/sqrt(p.getZ()), p.getY()/sqrt(p.getZ())]);///sqrt(p.getZ())
     }
 }

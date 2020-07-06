@@ -1,5 +1,3 @@
-let mouseLocked = false;
-
 function mouseDragged() {
 	UI.mouseDragged();
 	Drag.mouseDragged();
@@ -11,14 +9,8 @@ function mousePressed() {
 }
 
 function mouseClicked() {
-    UI.mouseClicked();
+    let r = UI.mouseClicked();
 	Drag.mouseClicked();
-	if(!mouseLocked) {
-		requestPointerLock();
-	} else {
-		exitPointerLock();
-	}
-	mouseLocked = !mouseLocked;
 }
 
 function mouseReleased() {
