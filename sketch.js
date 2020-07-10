@@ -1,7 +1,14 @@
-let zoomSld, scaleSld;
-let drawPtsBtn, drawLnBtn, cropBtn, rotBtn;
-let scene = []; // Array of objects
-let cam;
+let zoomSld;
+let camTypeBtn, drawPtsBtn, drawLnBtn, drawPolBtn, cropBtn, rotBtn;
+let objSel;
+let scene = []; // Array of visible objects
+let cam; // Camera
+let objList = {
+	"Def":  	genDef, // Temp
+	"Cube":		genCube,
+	"Fnc":		genFunc,
+	"Cyl": 		genCyl,
+};
 
 function setup() {
 	textFont("Orbitron");
@@ -9,11 +16,12 @@ function setup() {
 	background(32);
 
 	// Create UI elements
-	zoomSld = new Slider(0.01, 100, 1, 0,0, width/12, height/60, null, "Zoom");
-	scaleSld = new Slider(0.01, 100, 50, 0,0, width/12, height/60, null, "Scale");
+	zoomSld = new Slider(35, 1000, 500, 0,0, width/12, height/60, null, "Zoom");
+	let tmp = new UiElement(); // Blank space
+	camTypeBtn = new Button(0,0, width/8, height/30, "Perspective", changeCam);
 	drawPtsBtn = new ToggleButton(0,0, width/12, height/30, "Points", null, true);
-	drawLnBtn = new ToggleButton(0,0, width/12, height/30, "Lines", null, true);
 	cropBtn = new ToggleButton(0,0, width/12, height/30, "Crop", null, true);
+	drawLnBtn = new ToggleButton(0,0, width/12, height/30, "Lines", null, true);
 	rotBtn = new ToggleButton(0,0, width/12, height/30, "Rotate", () => {
 		if(rotBtn.active) {
 			requestPointerLock();
@@ -21,19 +29,23 @@ function setup() {
 			exitPointerLock();
 		}
 	}, false);
+	drawPolBtn = new ToggleButton(0,0, width/12, height/30, "Polys", null, true);
+	objSel = new OptionsBox(Object.keys(objList), height/25, () => {
+		scene = [];
+		scene.push(objList[objSel.selected]());
+	});
 
 	// Start UI
-	UI.tableWidth = 1;
+	UI.tableWidth = 2;
 	UI.tableHeight = 100;
 	UI.distrubute();
 
 	// Start scene objects
-	cam = new AbstractCamera(new Vector([3,3,3]), new Vector([PI/4,-3*PI/4,0]));
-		// Temp
-	scene.push(addCube());
-	scene.push(addCube().move(new Vector([2,0,0])));
-	scene.push(addCube().move(new Vector([0,2,0])));
-	scene.push(addCube().move(new Vector([0,0,2])));
+	let l = 1, d = 5;
+	cam = new PerspectiveCamera(new Vector([d*l,d*l,d*l]), new Vector([PI/4,-3*PI/4,0]));
+
+	// Add a default object to the scene
+	scene.push(genDef());
 }
 
 function draw() {
@@ -50,27 +62,17 @@ function draw() {
 	cam.update();
 	// Make the camera draw the objects in the scene
 	cam.render(scene);
-	//scene[0].move(new Vector([0.1, 0,0.1]));
 }
 
-function addCube() {
-	// Manually add cube
-	return new SolidObj(new Vector([0,0,0]), [
-		new Vector([1,1,1]),
-		new Vector([1,1,-1]),
-		new Vector([1,-1,1]),
-		new Vector([1,-1,-1]),
-		new Vector([-1,1,1]),
-		new Vector([-1,1,-1]),
-		new Vector([-1,-1,1]),
-		new Vector([-1,-1,-1])],
-		[
-			[0,1,3,2],
-			[0,2,6,4],
-			[0,1,5,4],
-			[4,5,7,6],
-			[1,3,7,5],
-			[2,3,7,6]
-		]
-		);
+/**
+ * Change the camera type and the text of the button
+ */
+function changeCam() {
+	if(camTypeBtn.text == "Perspective") {
+		camTypeBtn.text = "Orthographic";
+		cam = new OrthographicCamera(cam.pos, cam.rot);
+	} else {
+		camTypeBtn.text = "Perspective";
+		cam = new PerspectiveCamera(cam.pos, cam.rot);
+	}
 }

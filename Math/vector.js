@@ -228,12 +228,12 @@ class Vector {
     }
 
     /**
-     * Proyects the given vector using this one as
-     * the direction of the proyection line
+     * projects the given vector using this one as
+     * the direction of the projection line
      * 
      * @param v 
      */
-    proyect(v) {
+    project(v) {
         return this.copy().normalize().mult(this.dot(v));
     }
 
@@ -244,7 +244,7 @@ class Vector {
      * @param v 
      */
     reflect(v) {
-        let p = this.proyect(v);
+        let p = this.project(v);
         return p.mult(2).sub(v);
     }
 

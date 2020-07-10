@@ -14,7 +14,7 @@ class AbstractCamera {
         this.axis = this.getAxis();
 
         this.moveSpeed = 0.1;
-        this.rotSpeed = 0.02;
+        this.rotSpeed = 0.002;
     }
 
     /**
@@ -47,14 +47,14 @@ class AbstractCamera {
     }
 
     /**
-     * Gets the proyection of the points of the given object
+     * Gets the projection of the points of the given object
      * and draws the given object
      * 
      * @param obj 
      */
     draw(obj) {
-        // Get proyections
-        let proys = obj.points.map(p => {
+        // Get projections
+        let projs = obj.points.map(p => {
             // Transform the point to have coordinates relative to this camera 
             let v = p.copy().add(obj.pos).sub(this.pos);
             // Rotate the object acording to the rotation of this camera
@@ -63,18 +63,16 @@ class AbstractCamera {
             if(cropBtn.active) {
                 v = this.crop(v);
             }
-            // Proyect the point
-            return this.proyect(v);
-        })
-        // Scale the values
-        proys.forEach(p => p.mult(scaleSld.value));
+            // project the point
+            return this.project(v);
+        });
         
         // Draw points
         if(drawPtsBtn.active) {
             strokeWeight(obj.ptThick);
             stroke(obj.ptColor);
 
-            for(let p of proys) {
+            for(let p of projs) {
                 point(p.getX(), p.getY());
             }
         }
@@ -85,8 +83,8 @@ class AbstractCamera {
             stroke(obj.lnColor);
 
             for(let l of obj.lines) {
-                let p1 = proys[l[0]];
-                let p2 = proys[l[1]];
+                let p1 = projs[l[0]];
+                let p2 = projs[l[1]];
                 line(p1.getX(), p1.getY(), p2.getX(), p2.getY());
             }
         }
@@ -99,12 +97,16 @@ class AbstractCamera {
             } else {
                 noStroke();
             }
-            fill(obj.polColor);
+            if(drawPolBtn.active) {
+                fill(obj.polColor);
+            } else {
+                noFill();
+            }
 
             for(let p of obj.polygons) {
                 beginShape();
                 for(let i of p) {
-                    vertex(proys[i].getX(), proys[i].getY());
+                    vertex(projs[i].getX(), projs[i].getY());
                 }
                 endShape(CLOSE);
             }
@@ -117,20 +119,22 @@ class AbstractCamera {
     update() {
         // Create 3 axis in the direction the camera is pointing towards
         let u = (new Vector([1,0,0])).mult(this.moveSpeed);
-        let v = (new Vector([0,1,0])).mult(this.moveSpeed);
+        //let v = (new Vector([0,1,0])).mult(this.moveSpeed); (this one is not used)
         let w = (new Vector([0,0,1])).mult(this.moveSpeed);
-        u.rotate3D(this.rot.getX(), 0).rotate3D(this.rot.getY(), 1).rotate3D(this.rot.getZ(), 2);
-        v.rotate3D(this.rot.getX(), 0).rotate3D(this.rot.getY(), 1).rotate3D(this.rot.getZ(), 2);
-        w.rotate3D(this.rot.getX(), 0).rotate3D(this.rot.getY(), 1).rotate3D(this.rot.getZ(), 2);
+
+        u = u.rotate3D(this.rot.getX(), 0).rotate3D(this.rot.getY(), 1).rotate3D(this.rot.getZ(), 2);
+        //v = v.rotate3D(this.rot.getX(), 0).rotate3D(this.rot.getY(), 1).rotate3D(this.rot.getZ(), 2);
+        w = w.rotate3D(this.rot.getX(), 0).rotate3D(this.rot.getY(), 1).rotate3D(this.rot.getZ(), 2);
 
         // Remove their y component to make the player stay at the same height
+        u.set(1,0).normalize();
+        w.set(1,0).normalize();
 
         // Move
-        if(keyIsDown(87)) cam.pos.add(v); // W
-        //if(keyIsDown(87)) cam.pos.add(new Vector([0,0,this.moveSpeed])); // W
-        if(keyIsDown(83)) cam.pos.sub(new Vector([0,0,this.moveSpeed])); // S
-        if(keyIsDown(65)) cam.pos.sub(new Vector([this.moveSpeed,0,0])); // A
-        if(keyIsDown(68)) cam.pos.add(new Vector([this.moveSpeed,0,0])); // D
+        if(keyIsDown(87)) cam.pos.add(w.mult(this.moveSpeed)); // W
+        if(keyIsDown(83)) cam.pos.sub(w.mult(this.moveSpeed)); // S
+        if(keyIsDown(65)) cam.pos.sub(u.mult(this.moveSpeed)); // A
+        if(keyIsDown(68)) cam.pos.add(u.mult(this.moveSpeed)); // D
         if(keyIsDown(32)) cam.pos.add(new Vector([0,this.moveSpeed,0])); // SPACE
         if(keyIsDown(16)) cam.pos.sub(new Vector([0,this.moveSpeed/2,0])); // SHIFT
 
@@ -142,7 +146,7 @@ class AbstractCamera {
     }
 
     /**
-     * Rotate the objects that are going to be proyected 
+     * Rotate the objects that are going to be projected 
      * acording to the rotation of this camera 
      * 
      * @param v Vector to rotate
@@ -165,11 +169,37 @@ class AbstractCamera {
         }
         return v;
     }
+}
 
+/**
+ * Orthographic camera class
+ * projects the objects ignoring their Z coordinate
+ * this gives the effect of a parallel projection
+ */
+class OrthographicCamera extends AbstractCamera {
     /**
-     * Temp
+     * projects the point with this cameras projection type
+     * 
+     * @param p Point to be projected 
      */
-    proyect(p) {
-        return new Vector([p.getX()/sqrt(p.getZ()), p.getY()/sqrt(p.getZ())]);///sqrt(p.getZ())
+    project(p) {
+        let z = zoomSld.value/10;
+        return (new Vector([p.getX(), p.getY()])).mult(z);
+    }
+}
+
+/**
+ * Perspective camera class
+ * projects the objects appling perspective
+ */
+class PerspectiveCamera extends AbstractCamera {
+    /**
+     * projects the point with this cameras projection type
+     * 
+     * @param p Point to be projected 
+     */
+    project(p) {
+        let z = zoomSld.value;
+        return (new Vector([p.getX(), p.getY()])).mult(z/p.getZ());
     }
 }

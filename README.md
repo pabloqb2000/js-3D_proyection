@@ -1,7 +1,7 @@
 # js-ui_on_canvas_example
-Here I include an example on how to use the super simple libraries I built using <a href="https://p5js.org/">p5.js</a>. I also use this as default proyect.
+Here I include an example on how to use the super simple libraries I built using <a href="https://p5js.org/">p5.js</a>. I also use this as default project.
 ## URL
-This proyect is hosted by github pages at <a href="https://pabloqb2000.github.io/js-ui_on_canvas_example/">this link</a>.
+This project is hosted by github pages at <a href="https://pabloqb2000.github.io/js-ui_on_canvas_example/">this link</a>.
 # Libraries
 Here I include a little example on how the libraries I built work
 # UI
@@ -67,8 +67,8 @@ You can build a matrix in different ways and then perform some operations like:
 ## Screenshot
 <img src="imgs/screenshot01.png"></img>
 ## References
-To find more information about the <b>awesome</b> library used for this proyect visit:
+To find more information about the <b>awesome</b> library used for this project visit:
 <a href="https://p5js.org/"> https://p5js.org/ </a>
 
-## Other proyects
-Checkout my other proyects at <a href="https://pabloqb2000.github.io/Click_math/">Click math</a>
+## Other projects
+Checkout my other projects at <a href="https://pabloqb2000.github.io/Click_math/">Click math</a>
