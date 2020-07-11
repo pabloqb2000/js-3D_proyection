@@ -11,7 +11,7 @@ Inside the page you can change:
 - The 3D object to be proyected
 - The camera position and rotation
 ## Controls
-The contros are minecraft like, you can use WASD to move towards the direction of view, SPACE of SHIFT to move up and down and you can rotate the camera by clickng the rotate button and moving your mouse arround.
+The contros are minecraft like, you can use WASD to move towards the direction of view, SPACE of SHIFT to move up and down and you can rotate the camera by clickng the rotate button and moving your mouse arround, finally you can rotate the camera on the z axis with the left and right arrows.
 ## Screenshot
 <img src="imgs/screenshot01.png"></img>
 ## References
