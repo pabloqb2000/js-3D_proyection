@@ -139,6 +139,8 @@ class AbstractCamera {
         if(keyIsDown(16)) cam.pos.sub(new Vector([0,this.moveSpeed/2,0])); // SHIFT
 
         // Rotate
+        if(keyIsDown(37)) cam.rot.data[2] += this.moveSpeed/2; // LEFT ARROW
+        if(keyIsDown(39)) cam.rot.data[2] -= this.moveSpeed/2; // RIGHT ARROW
         if(rotBtn.active) {
             this.rot.data[1] += (movedX * this.rotSpeed) % (2*PI);
             this.rot.data[0] = min(max(-PI/2, this.rot.data[0] + movedY*this.rotSpeed), PI/2);
