@@ -39,6 +39,19 @@ class PointCloud {
         }
         return this;
     }
+
+    /**
+     * Rotate all points arround the given axis by a radians
+     * 
+     * @param a Angle to rotate
+     * @param axis Axis to rotate arround
+     */
+    rotate(a, axis) {
+        for(let p of this.points) {
+            p.rotate3D(a, axis);
+        }
+        return this;
+    }
 }
 
 /**

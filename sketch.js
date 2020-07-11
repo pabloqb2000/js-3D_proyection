@@ -4,10 +4,13 @@ let objSel;
 let scene = []; // Array of visible objects
 let cam; // Camera
 let objList = {
-	"Def":  	genDef, // Temp
-	"Cube":		genCube,
-	"Fnc":		genFunc,
-	"Cyl": 		genCyl,
+	"Rot Toroid":genRotToroid,
+	"Moebious":  genMoebious,
+	"Function":	 genFunc,
+	"Cylinder":  genCyl,
+	"Toroid": 	 genToroid,
+	"Cube":		 genCube,
+	"Sphere": 	 genSphere,
 };
 
 function setup() {
@@ -45,7 +48,7 @@ function setup() {
 	cam = new PerspectiveCamera(new Vector([d*l,d*l,d*l]), new Vector([PI/4,-3*PI/4,0]));
 
 	// Add a default object to the scene
-	scene.push(genDef());
+	scene.push(genRotToroid());
 }
 
 function draw() {
