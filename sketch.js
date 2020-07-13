@@ -44,8 +44,8 @@ function setup() {
 	UI.distrubute();
 
 	// Start scene objects
-	let l = 1, d = 5;
-	cam = new PerspectiveCamera(new Vector([d*l,d*l,d*l]), new Vector([PI/4,-3*PI/4,0]));
+	let d = 5;
+	cam = new PerspectiveCamera(new Vector([d,d,d]), new Vector([PI/4,-3*PI/4,0]));
 
 	// Add a default object to the scene
 	scene.push(genRotToroid());
